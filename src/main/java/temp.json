@@ -1,0 +1,53 @@
+{
+
+  "endDate" : "2017-08-31T00:00:00.000Z",
+
+  "caseSize" : 1,
+
+  "id" : "710267-01Aug2017-31Aug2017",
+
+  "branchInventory" : {
+
+    "198" : {
+
+      "cases" : 292,
+
+
+      "units" : 292,
+
+      "remainingUnits" : 0
+
+    },
+
+    "796" : {
+
+      "cases" : 0,
+
+      "units" : 0,
+
+      "remainingUnits" : 0
+
+    },
+
+    "705" : {
+
+      "cases" : 258,
+
+
+      "units" : 258,
+
+      "remainingUnits" : 0
+
+    }
+
+  },
+
+  "remainingCases" : -545,
+
+  "lineNumber" : "710267",
+
+  "totalCases" : 5,
+
+  "startDate" : "2017-08-01T00:00:00.000Z"
+
+}
