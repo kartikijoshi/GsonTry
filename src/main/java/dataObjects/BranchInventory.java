@@ -1,67 +1,118 @@
 package dataObjects;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-public class BranchInventory {
-	Pattern pattern = Pattern.compile("\\d+");
-	@SerializedName("198")
-	private Branch branchId198;
+public class BranchInventory extends DataAccessObject{
 	
-	@SerializedName("796")
-	private Branch branchId796;
-	
-	@SerializedName("705")
-	private Branch branchId705;
+	private List<Branch> branches = new ArrayList<Branch>();
 
-	public static BranchInventory fromJSONString(String string) {
-		BranchInventory b = new BranchInventory();
-		Gson gson = new Gson();
-//		 jsonValue = gson.toJson(string);
-//		new Gson().fromJson(string, BranchInventory);
-		return b;
+	@Override
+	public DataAccessObject convertJSONtoDAO(String jsonStr) throws ParseException {
+		
+		JsonObject jObject = new JsonParser().parse(jsonStr).getAsJsonObject();
+		for (Map.Entry<String,JsonElement> entry : jObject.entrySet()) {
+		    branches.add(Branch.JsontoPOJO(entry.getKey(), (JsonElement) entry.getValue()));
+		}
+		return this;
 	}
-	
+
+	@Override
+	public String convertDAOtoJSON(DataAccessObject dao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Branch> getBranches() {
+		return branches;
+	}
+
+	public void setBranches(List<Branch> branches) {
+		this.branches = branches;
+	}
+
 	@Override
 	public String toString() {
-		return "\n[branchId198=" +branchId198.toString() +"\nbranchId705=" +branchId705.toString() +"\nbranchId796=" +branchId796.toString();
+		return "BranchInventory [branches=\n" + branches + "]";
 	}
 
 }
 
 class Branch{
 	
+	private int branchId;
 	private int cases;
-	
 	private int units;
-	
 	private int remainingUnits;
-	
 	private Orders orders;
+	
+	public static Branch JsontoPOJO(String branchId, JsonElement jsonElement) throws ParseException{
+		Gson gson = new Gson();
+		Branch b = null;
+		JSONObject branchJSONObject = (JSONObject) new JSONParser().parse(jsonElement.toString());
+		if(branchJSONObject!=null && branchJSONObject.size()>0){
+			b = gson.fromJson(jsonElement, Branch.class);
+			b.branchId = Integer.parseInt(branchId);
+			JSONObject ordersJSONObject = (JSONObject) branchJSONObject.get("orders");
+			if(ordersJSONObject!=null && ordersJSONObject.size()>0){
+				b.orders = (Orders) b.orders.convertJSONtoDAO(ordersJSONObject.toString());
+			}
+		}
+		return b;
+	}
+
+	public int getBranchId() {
+		return branchId;
+	}
+
+	public void setBranchId(int branchId) {
+		this.branchId = branchId;
+	}
+
+	public int getCases() {
+		return cases;
+	}
+
+	public void setCases(int cases) {
+		this.cases = cases;
+	}
+
+	public int getUnits() {
+		return units;
+	}
+
+	public void setUnits(int units) {
+		this.units = units;
+	}
+
+	public int getRemainingUnits() {
+		return remainingUnits;
+	}
+
+	public void setRemainingUnits(int remainingUnits) {
+		this.remainingUnits = remainingUnits;
+	}
+
+	public Orders getOrders() {
+		return orders;
+	}
+
+	public void setOrders(Orders orders) {
+		this.orders = orders;
+	}
 
 	@Override
 	public String toString() {
-		return "Branch [cases=" + cases + ", units=" + units + ", remainingUnits=" + remainingUnits + ", orders="
-				+ orders + "]";
+		return "\n[branchId=" + branchId + ",\n cases=" + cases + ",\n units=" + units + ",\n remainingUnits="
+				+ remainingUnits + ",\n orders=" + orders + "]\n";
 	}
-}
-
-
-
-class Orders{
-	
-	private List<Order> orders;
-	
-}
-
-class Order{
-	
-	private long orderId;
-	
-	private String uom;
-	
-	private int amount;
 }

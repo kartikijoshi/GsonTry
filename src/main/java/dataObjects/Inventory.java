@@ -1,8 +1,11 @@
 package dataObjects;
-import java.util.Date;
-import java.util.List;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-public class Inventory
+import com.google.gson.Gson;
+
+public class Inventory extends DataAccessObject
 {
     private String id;
     
@@ -17,78 +20,69 @@ public class Inventory
     private int totalCases;
 
     private int remainingCases;
-    
-    private BranchInventory branchInventory;
 
-	@Override
-	public String toString() {
-		return "Inventory [id=" + id + ",\n lineNumber=" + lineNumber + ",\n startDate=" + startDate + ",\n endDate="
-				+ endDate + ",\n caseSize=" + caseSize + ",\n totalCases=" + totalCases + ",\n remainingCases="
-				+ remainingCases + ",\n branchInventory=" + branchInventory + "]";
-	}
+    private BranchInventory branchInventory;
 
 	public String getId() {
 		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public long getLineNumber() {
 		return lineNumber;
 	}
 
-	public void setLineNumber(long lineNumber) {
-		this.lineNumber = lineNumber;
-	}
-
 	public String getStartDate() {
 		return startDate;
-	}
-
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
 	}
 
 	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
-	}
-
 	public int getCaseSize() {
 		return caseSize;
-	}
-
-	public void setCaseSize(int caseSize) {
-		this.caseSize = caseSize;
 	}
 
 	public int getTotalCases() {
 		return totalCases;
 	}
 
-	public void setTotalCases(int totalCases) {
-		this.totalCases = totalCases;
-	}
-
 	public int getRemainingCases() {
 		return remainingCases;
-	}
-
-	public void setRemainingCases(int remainingCases) {
-		this.remainingCases = remainingCases;
 	}
 
 	public BranchInventory getBranchInventory() {
 		return branchInventory;
 	}
 
-	public void setBranchInventory(BranchInventory branchInventory) {
-		this.branchInventory = branchInventory;
+	@Override
+	public DataAccessObject convertJSONtoDAO(String jsonStr) throws ParseException {
+		Gson gson = new Gson();
+		Inventory inventory = null ;
+		JSONObject inventoryJSONObject = (JSONObject) new JSONParser().parse(jsonStr);
+		if(inventoryJSONObject!=null){
+			inventory = gson.fromJson(jsonStr, Inventory.class);
+			JSONObject branchJSONObject = (JSONObject) inventoryJSONObject.get("branchInventory");
+			if(branchJSONObject!=null && branchJSONObject.size()>0){
+				inventory.branchInventory = (BranchInventory) inventory.branchInventory.convertJSONtoDAO(branchJSONObject.toJSONString());
+			}
+			System.out.println("DAO of inventory: \n" +inventory);
+		}
+		
+		return inventory;
+	}
+
+	@Override
+	public String convertDAOtoJSON(DataAccessObject dao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "Inventory [id=" + id + ",\n lineNumber=" + lineNumber + ",\n startDate=" + startDate + ",\n endDate="
+				+ endDate + ",\n caseSize=" + caseSize + ",\n totalCases=" + totalCases + ",\n remainingCases="
+				+ remainingCases + ",\n branchInventory=" + branchInventory + "]";
 	}
 
 }
